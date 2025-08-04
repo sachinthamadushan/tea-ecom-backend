@@ -67,10 +67,29 @@ const productFindById = async(req,res) => {
     }
 }
 
+const deleteProduct = async(req,res) => {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.id);
+        if(!product){
+            return res.status(404).json({error: 'Product not found'});
+        }
+        if(product.image){
+            const imgPath = path.join(__dirname,'../uploads',product.image);
+            if(fs.existsSync(imgPath)){
+                fs.unlinkSync(imgPath);
+            }
+        }
+        res.status(200).json({msg: 'Product Deleted Successfully',product});
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     createProduct,
     getProducts,
     updateProduct,
-    productFindById
+    productFindById,
+    deleteProduct
 }
 
